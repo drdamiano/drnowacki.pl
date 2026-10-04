@@ -1,0 +1,23 @@
+{
+  "name": "drnowacki.pl",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Strona drnowacki.pl — statyczny HTML generowany z site.config.mjs",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/build.mjs && node scripts/serve.mjs",
+    "serve": "node scripts/serve.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "todo": "node scripts/todo.mjs"
+  },
+  "dependencies": {
+    "@notionhq/client": "^5.27.0"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.5"
+  }
+}

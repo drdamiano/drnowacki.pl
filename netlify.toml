@@ -1,0 +1,39 @@
+# Netlify — konfiguracja wdrożenia drnowacki.pl
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# Nagłówki bezpieczeństwa. Bez cookies, bez analityki — baner cookies niepotrzebny.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Frame-Options = "SAMEORIGIN"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+    Strict-Transport-Security = "max-age=31536000"
+
+# Fonty i obrazy z hashem w nazwie — długi cache
+[[headers]]
+  for = "/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/img/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Strona podziękowania nie powinna trafić do wyszukiwarek
+[[headers]]
+  for = "/dziekujemy"
+  [headers.values]
+    X-Robots-Tag = "noindex"
