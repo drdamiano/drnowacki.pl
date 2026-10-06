@@ -12,7 +12,7 @@
 //    Listę wszystkich TODO wypisuje: npm run todo
 //  • Treść ma charakter informacyjny (art. 14 ustawy o działalności leczniczej):
 //    bez promocji, rabatów, „najlepszy”, gwarancji efektu, zdjęć przed/po.
-//    Tytuły: „lek. dent.”, „leczenie ortodontyczne” (nie „ortodonta”, nie „dr”).
+//    Tytuły: „lek. dent. inż.”, „leczenie ortodontyczne” (nie „ortodonta”, nie „dr”).
 // =============================================================================
 
 export default {
@@ -21,7 +21,7 @@ export default {
   // ---------------------------------------------------------------------------
   site: {
     url: 'https://drnowacki.pl',
-    title: 'lek. dent. Damian Nowacki — leczenie ortodontyczne, Kraków',
+    title: 'lek. dent. inż. Damian Nowacki — leczenie ortodontyczne, Kraków',
     description:
       'Leczenie ortodontyczne w Krakowie: nakładki ortodontyczne, aparaty stałe, leczenie dzieci. Opinie pacjentów, wolne terminy online i informacje o pierwszej wizycie.',
     themeColor: '#FAF8F5',
@@ -31,7 +31,7 @@ export default {
   //  Lekarz
   // ---------------------------------------------------------------------------
   person: {
-    honorific: 'lek. dent.',
+    honorific: 'lek. dent. inż.',
     firstName: 'Damian',
     lastName: 'Nowacki',
     jobTitle: 'lekarz dentysta', // używane w danych strukturalnych (JSON-LD)
@@ -59,9 +59,12 @@ export default {
     // Portret w pierwszym ekranie. Wrzuć JPG/PNG/WebP — build sam zrobi AVIF + WebP
     // w kilku rozmiarach. Dopóki pliku nie ma, wyświetla się neutralny placeholder.
     portrait: {
-      src: 'assets/portret.jpg', // TODO: wgraj plik assets/portret.jpg (najlepiej pionowy, min. 1200 px szerokości)
-      alt: 'lek. dent. Damian Nowacki',
+      src: 'assets/portret.jpg',
+      alt: 'lek. dent. inż. Damian Nowacki',
       aspect: [4, 5], // proporcje kadru (szerokość, wysokość)
+      // Wycinek z oryginalnego zdjęcia (w pikselach oryginału 1335×2000).
+      // Plik zostaje nietknięty — żeby zmienić kadr, zmień liczby. null = cały kadr.
+      crop: { left: 110, top: 220, width: 1040, height: 1300 },
     },
     // Własny obrazek do udostępniania linku (Open Graph), 1200×630 px.
     // Jeśli pliku nie ma, używany jest neutralny obrazek z monogramem ND.
@@ -97,7 +100,7 @@ export default {
     name: 'kontakt', // nazwa formularza w Netlify — nie zmieniaj po wdrożeniu
     intro: 'Zostaw imię i numer telefonu. Oddzwonimy, odpowiemy na pytania i ustalimy termin wizyty.', // TODO: potwierdź
     // Jedno zdanie nad przyciskiem: kto i kiedy oddzwoni.
-    callbackNote: 'Oddzwonimy w ciągu 1 dnia roboczego.', // TODO: potwierdź termin i dopisz, kto dzwoni (np. „Oddzwoni lek. dent. Damian Nowacki lub asystentka…”)
+    callbackNote: 'Oddzwonimy w ciągu 1 dnia roboczego.', // TODO: potwierdź termin i dopisz, kto dzwoni (np. „Oddzwoni lek. dent. inż. Damian Nowacki lub asystentka…”)
     // Numer, z którego oddzwaniacie — pokazywany na stronie podziękowania,
     // żeby pacjent rozpoznał połączenie. null = nie pokazuj.
     callbackPhone: null, // TODO: np. '+48 600 000 000'

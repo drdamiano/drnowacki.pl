@@ -33,7 +33,7 @@ Dopóki pole ma wartość `null`, dany element **nie pojawia się na stronie** (
 
 | # | Plik | Co |
 |---|---|---|
-| 17 | `assets/portret.jpg` | Portret do pierwszego ekranu. Do tego czasu jest placeholder z monogramem |
+| 17 | ~~`assets/portret.jpg`~~ | ✔ Zrobione (6.10.2026). Kadr zmienisz w `images.portrait.crop` |
 | 18 | `assets/logo.svg` + `brand.logo` | Logo. Do tego czasu logotyp tekstowy „ND · DAMIAN NOWACKI · ORTODONCJA” |
 | 19 | `assets/favicon.svg` | (opcjonalnie) własny favicon. Domyślnie monogram ND |
 | 20 | `assets/og.jpg` | (opcjonalnie) obrazek do udostępniania 1200×630. Domyślnie neutralny z monogramem |

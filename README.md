@@ -1,6 +1,6 @@
 # drnowacki.pl
 
-Strona lek. dent. Damiana Nowackiego (leczenie ortodontyczne, Kraków). Zastępuje wizytówkę na bio.site i formularz Tally.
+Strona lek. dent. inż. Damiana Nowackiego (leczenie ortodontyczne, Kraków). Zastępuje wizytówkę na bio.site i formularz Tally.
 
 **Jedyny cel strony:** zamienić wejście w umówioną wizytę (rezerwacja online w ZnanyLekarz) albo w prośbę o telefon (krótki formularz „Oddzwonimy”).
 

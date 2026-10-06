@@ -42,9 +42,11 @@ function minifyCss(css) {
 // ---------------------------------------------------------------------------
 //  Obrazy: AVIF + WebP w kilku szerokościach, z wymiarami
 // ---------------------------------------------------------------------------
-async function responsiveImage(srcPath, { name, widths, aspect, sizes, position = 'attention' }) {
+async function responsiveImage(srcPath, { name, widths, aspect, sizes, crop = null, position = 'attention' }) {
   const s = await getSharp();
-  const input = await fs.readFile(srcPath);
+  const original = await fs.readFile(srcPath);
+  // Opcjonalny wycinek z configu (np. images.portrait.crop), przed skalowaniem
+  const input = crop ? await s(original).rotate().extract(crop).toBuffer() : original;
   const meta = await s(input).rotate().metadata();
   const [ow, oh] = meta.autoOrient ? [meta.autoOrient.width, meta.autoOrient.height] : [meta.width, meta.height];
   const [aw, ah] = aspect ?? [ow, oh];
@@ -106,6 +108,7 @@ async function processImages() {
       name: 'portret',
       widths: [400, 600, 800, 1080],
       aspect: config.images.portrait.aspect,
+      crop: config.images.portrait.crop,
       sizes: '(min-width: 56em) 30rem, calc(100vw - 2rem)',
     });
   }
