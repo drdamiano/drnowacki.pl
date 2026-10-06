@@ -124,11 +124,13 @@ Funkcja `netlify/functions/submission-created.mjs` uruchamia się po każdym zwe
 
 1. **Integracja Notion:** https://www.notion.so/profile/integrations → **New integration** → typ *Internal*, workspace z bazą „LEADY IG”. W *Capabilities* zostaw **Read content** i **Insert content**. Skopiuj **Internal Integration Secret** (zaczyna się od `ntn_`).
 2. **Udostępnij bazę integracji:** otwórz „LEADY IG” w Notion → menu **•••** (prawy górny róg) → **Connections** → dodaj swoją integrację. Bez tego API zwróci błąd `object_not_found`.
-3. **Zmienne środowiskowe w Netlify:** Project configuration → **Environment variables** → Add a variable:
-   - `NOTION_TOKEN` = sekret z punktu 1 (zakres: co najmniej *Functions*),
+3. **Zmienne środowiskowe w Netlify:** Project configuration → **Environment variables** → Add a variable → Add a single variable:
+   - **Key:** `NOTION_TOKEN` (to jest *nazwa* zmiennej, nie klucz z Notion!),
+   - zaznacz **Contains secret values**; zakresy zostaw domyślne (Builds, **Functions**, Runtime),
+   - **Values:** przy sekrecie dostępne jest tylko „Different value for each deploy context”. Wklej klucz `ntn_…` w pole **Production**, resztę zostaw pustą,
    - opcjonalnie `NOTION_DATA_SOURCE_ID`; domyślnie `3279eb4e-bba0-8020-ba7b-000bdc154d33` z configu.
 4. **Zrób nowy deploy.** Funkcje widzą nowe zmienne dopiero po deployu.
-5. **Logi:** Logs → Functions → `submission-created`. Udany zapis: `[notion] Zapisano zgłoszenie … (pola: …)`. Logi nie zawierają danych osobowych.
+5. **Logi:** **Cloud compute → Functions → `submission-created`**, potem zmień „Real-time” na „Last hour” albo „Last 24 hours” (logi są trzymane 24 h). Udany zapis: `[notion] Zapisano zgłoszenie … (pola: …)`. `Brak NOTION_TOKEN` oznacza, że funkcja nie widzi zmiennej: sprawdź punkt 3 i zrób deploy. Logi nie zawierają danych osobowych.
 
 Jak działa mapowanie (sprawdzone na schemacie bazy z 4.10.2026):
 
