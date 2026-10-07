@@ -100,7 +100,7 @@ function findAsset(p) {
 }
 
 async function processImages() {
-  const assets = { portrait: null, locations: [], logo: null, og: null };
+  const assets = { portrait: null, locations: [], logo: null, mark: null, og: null };
 
   const portraitSrc = findAsset(config.images.portrait?.src);
   if (portraitSrc) {
@@ -124,6 +124,16 @@ async function processImages() {
             sizes: '(min-width: 48em) 22rem, calc(100vw - 2rem)',
           })
         : null;
+  }
+
+  // Monogram (SVG) — kopiowany z hashem w nazwie; proporcje z viewBox
+  if (config.brand.mark && existsSync(rel(config.brand.mark))) {
+    const buf = await fs.readFile(rel(config.brand.mark));
+    const vb = buf.toString('utf8').match(/viewBox=["']\s*[\d.-]+[\s,]+[\d.-]+[\s,]+([\d.]+)[\s,]+([\d.]+)/);
+    const out = `logo-nd.${hashOf(buf)}.svg`;
+    await fs.mkdir(path.join(DIST, 'img'), { recursive: true });
+    await fs.writeFile(path.join(DIST, 'img', out), buf);
+    assets.mark = { src: `/img/${out}`, ratio: vb ? `${vb[1]} / ${vb[2]}` : '3 / 2' };
   }
 
   // Logo (SVG lub raster)
@@ -270,7 +280,7 @@ async function build() {
   const kb = (n) => `${(n / 1024).toFixed(1)} kB`;
   const indexSize = Buffer.byteLength(String(pages['index.html']));
   console.log(`✔ Zbudowano dist/ w ${Date.now() - t0} ms (index.html: ${kb(indexSize)}, CSS inline: ${kb(css.length)})`);
-  console.log(`  Portret: ${assets.portrait ? 'tak' : 'brak (placeholder)'} · Logo: ${assets.logo ? 'tak' : 'tekstowe'} · OG: ${assets.og.src}`);
+  console.log(`  Portret: ${assets.portrait ? 'tak' : 'brak (placeholder)'} · Monogram: ${assets.mark ? 'tak' : 'tekstowy'} · OG: ${assets.og.src}`);
   console.log(`  Widżet ZnanyLekarz: ${config.booking.widgetHtml.trim() ? 'tak (ładowany po kliknięciu)' : 'brak — przycisk prowadzi do profilu'} · Cennik: ${config.pricing.visible ? 'widoczny' : 'ukryty'}`);
 
   const todos = await collectTodos();

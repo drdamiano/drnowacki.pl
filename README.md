@@ -78,14 +78,18 @@ npm run todo
 
 Wszystko, co się zmienia, jest w [`site.config.mjs`](site.config.mjs). Po zmianie: commit → push → Netlify sam przebuduje stronę (ok. 1 min).
 
-- **`null` = brak danych**: element nie pojawi się na stronie. Nic nie jest zmyślane, np. bez liczby opinii sekcja „Opinie” pokazuje tylko link do profilu.
-- **Opinie:** `reviews.count`, `reviews.average`, `reviews.updatedAt` – aktualizuj ręcznie co jakiś czas.
+- **`null` = brak danych**: element nie pojawi się na stronie. Nic nie jest zmyślane.
+- **Opinie:** bez liczb, tylko zaproszenie do przeczytania opinii w ZnanyLekarz (`reviews.title`, `reviews.text`, `reviews.linkLabel`).
 - **Cennik:** uzupełnij `pricing.items[].price` i ustaw `pricing.visible: true`.
-- **Nowa placówka (np. własna klinika od grudnia 2026):** wpis jest już w `locations` z `show: false`. Uzupełnij dane i zmień na `show: true`. Placówka pojawi się w pierwszym ekranie, w sekcji „Gdzie przyjmuję” i w danych strukturalnych (JSON-LD).
+- **Placówki** (`locations`): kolejność = kolejność na stronie. ORTHOHOUSE ma `featured: true`, więc jest głównym miejscem: pierwszy w pierwszym ekranie, w nawigacji, we własnej sekcji pod „Tylko między nami” i jako wyróżniona karta w „Gdzie przyjmuję”. Pozostałe (LUX MED) są pod hasłem „Przyjmuję także w”. Dopóki ORTHOHOUSE ma `note` („Przyjęcia od grudnia 2026”), jego przycisk prowadzi do formularza („Zapytaj o pierwsze terminy”). Po usunięciu `note` prowadzi do rezerwacji online. Placówki w polityce prywatności są osobno: `privacy.facilities`.
 - **Zdjęcia:** wrzuć do `assets/` (instrukcja w [assets/README.md](assets/README.md)). Build sam robi AVIF/WebP w kilku rozmiarach z `width`/`height`.
 - **Kolory i fonty:** zmienne w `:root` na początku `src/styles/main.css`.
+- **Teksty sekcji:** hook i zdanie pod nim (`person.hook`, `person.approach`), przyciski (`cta`), pasek z hasłami (`ticker`), ciemna sekcja „Tylko między nami” (`manifesto`), „Dla kogo” z przyciskiem „Wyślij rodzicom” (`audiences`), „Przed odbudową estetyczną” (`restoration`), pierwsza wizyta (`firstVisitTitle`, `firstVisit`), zakres (`services`), pytania (`faqTitle`, `faq`), rezerwacja (`booking.title`, `booking.text`), formularz (`form.title`, `form.step1`, `form.step2`). `null` lub pusta lista ukrywa element.
+- **„Wyślij rodzicom”** (karta „Nastolatki”) otwiera systemowe udostępnianie (WhatsApp, Messenger, SMS) albo kopiuje link. Link ma `?utm_source=polecenie&utm_medium=nastolatek`, więc takie zgłoszenia rozpoznasz w Netlify (i w Notion, jeśli dodasz kolumnę „Źródło”).
+- **Formularz ma dwa kroki:** 1) jedno kliknięcie „Od czego zaczynamy?”, 2) imię, telefon, zgoda. Bez JavaScriptu oba kroki są widoczne naraz, a Netlify widzi wszystkie pola w statycznym HTML.
+- **Animacje:** słowa w pierwszym ekranie wyłaniają się spod maski, portret odsłania się jak kurtyna i ma lekką paralaksę, tekst w ciemnej sekcji rozjaśnia się słowo po słowie, linia kroków wypełnia się przy przewijaniu, a pasek z zakresem przesuwa się razem z przewijaniem. Przy włączonej w systemie opcji „Ogranicz ruch” strona jest całkowicie statyczna. Tempo ustawiają zmienne `--ease-out` i `--dur-enter` w `:root`.
 
-Build pilnuje zgodności z art. 14 ustawy o działalności leczniczej: przerwie się, jeśli w treści strony pojawi się „ortodonta”, „specjalista”, „dr ”, „najlepszy”, „gwarancja”, „promocja” lub „rabat”.
+Build przerwie się, jeśli w treści strony pojawi się „ortodonta”, „specjalista”, „dr ”, „najlepszy”, „gwarancja”, „promocja” lub „rabat”. Pilnuje to tytułów zawodowych (bez sugerowania specjalizacji) i chroni przed obietnicami efektu. Listę zmienisz w `scripts/build.mjs` → `forbidden`.
 
 ## 4. Wdrożenie na Netlify
 
@@ -139,8 +143,11 @@ Jak działa mapowanie (sprawdzone na schemacie bazy z 4.10.2026):
 | Imię | **Imię i Nazwisko** (title) | tekst |
 | Telefon | **Telefon** (number) | 9 cyfr bez +48, np. `600123456` (tak jak istniejące wpisy) |
 | E-mail | **Email** (email) | jeśli podany |
-| Co Cię interesuje? | **Preferencja Leczenia** (select) | Niewidoczne nakładki → „Niewidoczne nakładki”, Tradycyjny aparat stały → „Tradycyjny aparat stały”, Leczenie dziecka → „Dzieci”, Nie wiem → „Zdaję się na opinię Doktora” |
+| Od czego zaczynamy? | **Preferencja Leczenia** (select) | Nie wiem jeszcze → „Zdaję się na opinię Doktora”, Leczenie nastolatka lub dziecka → „Dzieci”, Aparat stały → „Tradycyjny aparat stały”, Nakładki → „Niewidoczne nakładki” |
 | — | **Status** | **nigdy nie jest ruszany** |
+
+Gdy w configu pojawi się opcja, której nie ma w kolumnie „Preferencja Leczenia”, zapisze się `notion.interestFallback` („Zdaję się na opinię Doktora”), a nie błąd. Pełny wybór pacjenta jest zawsze w Netlify i w e-mailu.
+
 
 - Funkcja używa Notion API w wersji `2025-09-03`: rodzicem nowej strony jest **data source** (`parent: { type: "data_source_id", … }`), a schemat pobiera `dataSources.retrieve`. Tak każe aktualna dokumentacja Notion: przy API 2025-09-03 tworzenie stron w bazie wymaga `data_source_id`.
 - Jeśli zmienisz typ kolumny **Telefon** na *Phone*, funkcja sama zacznie zapisywać `+48 XXX XXX XXX`.
@@ -181,10 +188,10 @@ Mechanizm ładowania na żądanie jest sprawdzony lokalnie: przed kliknięciem n
 
 ## 11. Uwagi prawne
 
-- **Polityka prywatności** to szkielet. Fragmenty `[TODO: …]` są wyróżnione na żółto i widoczne na stronie, dopóki ich nie uzupełnisz w `site.config.mjs` (`admin`, `privacy`) i w `src/templates/pages.mjs`. Treść warto zweryfikować z prawnikiem lub IOD.
+- **Polityka prywatności** jest uzupełniona (7.10.2026). Administrator, okres przechowywania, odbiorcy i placówki są w `site.config.mjs` → `admin` i `privacy`; zmiana tam aktualizuje stronę. Treść warto raz przejrzeć z prawnikiem lub IOD.
 - Pole „Co Cię interesuje?” może zawierać informację o zdrowiu (art. 9 RODO). Dlatego zgoda w formularzu obejmuje wprost „informacje o planowanym leczeniu”.
 - Zgłoszenia są przechowywane w Netlify (USA) i, po włączeniu, w Notion (USA). Sprawdź/zaakceptuj umowy powierzenia (DPA) obu dostawców.
-- Treści są informacyjne (art. 14 u.d.l.): bez cen promocyjnych, rabatów, „najlepszy”, gwarancji efektu i zdjęć przed/po. Liczba i średnia opinii z ZnanyLekarz są pokazywane z datą; treści opinii nie są kopiowane.
+- Teksty od 6.10.2026 celowo stosują techniki perswazji (hook, wyobrażenie efektu, dowód społeczny, rozbrajanie obaw). Nie zawierają wymyślonych liczb, fałszywej presji czasu ani gwarancji efektu. Zgodność z art. 14 ustawy o działalności leczniczej i z Kodeksem Etyki Lekarskiej oceń sam lub z prawnikiem. Treści opinii pacjentów nie są kopiowane.
 - Dane strukturalne (JSON-LD: `Person` + `Physician` z adresami placówek) celowo nie mają `medicalSpecialty` ani `aggregateRating`.
 
 Fonty: Cormorant Garamond i Jost na licencji SIL Open Font License 1.1 (pliki licencji w `src/fonts/`).

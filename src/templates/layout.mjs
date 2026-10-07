@@ -35,6 +35,7 @@ ${page.noindex ? html`<meta name="robots" content="noindex">` : html`<link rel="
 <meta property="og:image:alt" content="${config.person.honorific} ${fullName(config.person)} · ${config.person.subtitle} · ${config.person.city}">
 <meta name="twitter:card" content="summary_large_image">
 <style>${raw(css)}</style>
+<script>/* animacje przy przewijaniu: włączane przed renderem; gdyby main.js się nie załadował, treść pokaże się po 3 s */matchMedia('(prefers-reduced-motion: reduce)').matches||(document.documentElement.classList.add('js-reveal'),setTimeout(function(){window.__reveal||document.documentElement.classList.remove('js-reveal')},3000))</script>
 ${page.jsonLd ? html`<script type="application/ld+json">${raw(JSON.stringify(page.jsonLd).replaceAll('<', '\\u003c'))}</script>` : ''}
 <script type="module" src="/js/main.js"></script>
 </head>
@@ -57,7 +58,16 @@ function brandMark(ctx) {
   if (logo) {
     return html`<img class="brand__logo" src="${logo.src}" width="${logo.width}" height="${logo.height}" alt="${brand.monogram} · ${brand.wordmark} · ${brand.tagline}">`;
   }
-  return html`<span class="brand__mono">${brand.monogram}</span><span class="brand__sep" aria-hidden="true">·</span><span class="brand__name">${brand.wordmark}</span><span class="brand__tag"><span class="brand__sep" aria-hidden="true">·</span>${brand.tagline}</span>`;
+  const mark = ctx.assets.mark
+    ? html`${markEl(ctx, 'brand__mark')}<span class="sr-only">${brand.monogram} </span>`
+    : html`<span class="brand__mono">${brand.monogram}</span><span class="brand__sep" aria-hidden="true">·</span>`;
+  return html`${mark}<span class="brand__name">${brand.wordmark}</span><span class="brand__tag"><span class="brand__sep" aria-hidden="true">·</span>${brand.tagline}</span>`;
+}
+
+// Monogram ND jako maska CSS — przyjmuje kolor tekstu (currentColor)
+export function markEl(ctx, className, attrs = '') {
+  const m = ctx.assets.mark;
+  return m ? html`<span class="mark ${className}" aria-hidden="true" style="--mark:url(${m.src});--mark-ratio:${m.ratio}"${raw(attrs ? ' ' + attrs : '')}></span>` : '';
 }
 
 function header(ctx, page) {
@@ -65,9 +75,12 @@ function header(ctx, page) {
   const home = page.path === '/';
   const p = home ? '' : '/'; // na podstronach linki prowadzą na stronę główną
   const items = [
-    ['opinie', 'Opinie'],
-    ['pierwsza-wizyta', 'Pierwsza wizyta'],
+    config.locations.some((l) => l.featured && l.show !== false)
+      ? ['orthohouse', config.locations.find((l) => l.featured).name]
+      : null,
+    config.audiences ? ['dla-kogo', 'Dla kogo'] : null,
     ['zakres', 'Zakres'],
+    config.faq?.length ? ['pytania', 'Pytania'] : null,
     config.pricing.visible ? ['cennik', 'Cennik'] : null,
     ['gdzie', 'Gdzie przyjmuję'],
   ].filter(Boolean);
@@ -94,7 +107,7 @@ function footer(ctx) {
 
   return html`<footer class="site-footer">
   <div class="container site-footer__inner">
-    <p class="site-footer__brand">${config.brand.monogram} <span aria-hidden="true">·</span> ${fullName(person)}</p>
+    <p class="site-footer__brand">${ctx.assets.mark ? markEl(ctx, 'site-footer__mark') : html`${config.brand.monogram} <span aria-hidden="true">·</span>`} ${fullName(person)}</p>
     <p>${person.honorific} ${fullName(person)} · ${person.subtitle} · ${person.city}${person.pwz ? html` · PWZ ${person.pwz}` : ''}</p>
     ${adminLine ? html`<p>${adminLine}</p>` : ''}
     <ul class="site-footer__links">

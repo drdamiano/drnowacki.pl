@@ -6,12 +6,11 @@
 //
 //  Zasady:
 //  • Po zmianie: zapisz → commit → push. Netlify sam przebuduje stronę.
-//  • `null` = brak danych → dany element po prostu nie pojawi się na stronie
-//    (nic nie jest zmyślane).
+//  • `null` = brak danych → dany element po prostu nie pojawi się na stronie.
 //  • Linie oznaczone „TODO” trzeba uzupełnić lub potwierdzić przed publikacją.
 //    Listę wszystkich TODO wypisuje: npm run todo
-//  • Treść ma charakter informacyjny (art. 14 ustawy o działalności leczniczej):
-//    bez promocji, rabatów, „najlepszy”, gwarancji efektu, zdjęć przed/po.
+//  • Teksty mogą przekonywać, ale nie mogą zmyślać: żadnych wymyślonych liczb,
+//    terminów „na wyczerpaniu” ani obietnic efektu, których nie da się dotrzymać.
 //    Tytuły: „lek. dent. inż.”, „leczenie ortodontyczne” (nie „ortodonta”, nie „dr”).
 // =============================================================================
 
@@ -23,12 +22,12 @@ export default {
     url: 'https://drnowacki.pl',
     title: 'lek. dent. inż. Damian Nowacki — leczenie ortodontyczne, Kraków',
     description:
-      'Leczenie ortodontyczne w Krakowie: nakładki ortodontyczne, aparaty stałe, leczenie dzieci. Opinie pacjentów, wolne terminy online i informacje o pierwszej wizycie.',
+      'Kompleksowe leczenie ortodontyczne w Krakowie dla dorosłych, nastolatków i dzieci. Estetyka uśmiechu i przygotowanie zgryzu do licówek, bondingu i implantów. Sprawdź wolne terminy online.',
     themeColor: '#FAF8F5',
   },
 
   // ---------------------------------------------------------------------------
-  //  Lekarz
+  //  Lekarz i pierwszy ekran
   // ---------------------------------------------------------------------------
   person: {
     honorific: 'lek. dent. inż.',
@@ -37,10 +36,22 @@ export default {
     jobTitle: 'lekarz dentysta', // używane w danych strukturalnych (JSON-LD)
     subtitle: 'Leczenie ortodontyczne',
     city: 'Kraków',
-    // Jedno zdanie o podejściu, wyświetlane w pierwszym ekranie pod nazwiskiem.
-    approach: null, // TODO: jedno zdanie o podejściu do leczenia (informacyjnie, bez „najlepszy”, bez obietnic efektu)
+    // Hook — duże zdanie pod nazwiskiem. Pojawia się słowo po słowie. null = brak.
+    // Inne propozycje:
+    //   'Zmiana, którą zobaczą wszyscy. Leczenie, którego nie zauważy nikt.'
+    //   'Twój uśmiech. Zaprojektowany z inżynierską precyzją.'
+    hook: 'Precyzja inżyniera. Uważność lekarza.', // TODO: potwierdź
+    // Krótkie zdanie pod hookiem (mniejszą czcionką). null = brak.
+    approach: 'Kompleksowe leczenie ortodontyczne, które wydobywa naturalne piękno Twojego uśmiechu — w każdym wieku.', // TODO: potwierdź
     // Numer prawa wykonywania zawodu — jeśli chcesz go pokazać w stopce.
     pwz: null, // TODO (opcjonalnie): numer PWZ, np. '1234567'
+  },
+
+  // Przyciski w pierwszym ekranie i na pasku na telefonie
+  cta: {
+    primary: 'Sprawdź wolne terminy', // prowadzi do rezerwacji online
+    secondary: 'Wolę, żeby ktoś zadzwonił', // prowadzi do formularza
+    note: 'Rezerwacja online działa całą dobę.', // drobny tekst pod przyciskami; null = brak
   },
 
   // ---------------------------------------------------------------------------
@@ -50,9 +61,11 @@ export default {
     monogram: 'ND',
     wordmark: 'Damian Nowacki',
     tagline: 'Ortodoncja',
-    // Gdy wgrasz logo, wpisz ścieżkę, np. 'assets/logo.svg' (SVG lub PNG).
-    // Do tego czasu w nagłówku jest logotyp tekstowy „ND · DAMIAN NOWACKI · ORTODONCJA”.
-    logo: null, // TODO: 'assets/logo.svg'
+    // Monogram ND (wektor wycięty z assets/LOGO.jpg). Kolor nadaje strona,
+    // więc działa na jasnym i ciemnym tle. null = tekstowe „ND”.
+    mark: 'assets/logo-nd.svg',
+    // Pełne logo jako obrazek zamiast monogramu i napisu (zwykle niepotrzebne).
+    logo: null,
   },
 
   images: {
@@ -72,13 +85,68 @@ export default {
   },
 
   // ---------------------------------------------------------------------------
-  //  Opinie (ZnanyLekarz) — tylko liczby, bez kopiowania treści opinii
+  //  Ciemna sekcja pod pierwszym ekranem — tekst rozjaśnia się słowo po słowie
+  //  podczas przewijania. null = sekcja się nie pokaże.
+  // ---------------------------------------------------------------------------
+  manifesto: {
+    eyebrow: 'Tylko między nami',
+    // Wcześniejsza wersja:
+    //   'Większość osób nie zauważy, że jesteś w trakcie leczenia. Zauważą dopiero efekt — i zapytają, co się zmieniło. Ty będziesz wiedzieć.'
+    text: 'Nikt nie musi wiedzieć, nad czym pracujesz. Zauważą dopiero efekt — i zapytają, co się zmieniło. Ty będziesz wiedzieć.',
+  },
+
+  // ---------------------------------------------------------------------------
+  //  Pasek pod pierwszym ekranem — hasła przesuwające się razem z przewijaniem.
+  //  Pusta lista = pasek się nie pokaże.
+  // ---------------------------------------------------------------------------
+  ticker: ['Estetyka uśmiechu', 'Zgryz', 'Dorośli', 'Nastolatki', 'Dzieci', 'Przed odbudową estetyczną'],
+
+  // ---------------------------------------------------------------------------
+  //  Dla kogo — trzy grupy. `share: true` dodaje przycisk „Wyślij rodzicom”
+  //  (udostępnia stronę z oznaczeniem źródła utm_source=polecenie).
+  // ---------------------------------------------------------------------------
+  audiences: {
+    eyebrow: 'Dla kogo',
+    title: 'Uśmiech nie ma metryki',
+    items: [
+      {
+        title: 'Dorośli',
+        text: 'Odkładasz to od lat? Leczenie w dorosłym wieku to dziś codzienność. Plan dopasowujemy do Twojego zgryzu, pracy i stylu życia — tak, żeby efekt był naturalny, a leczenie nie wywracało codzienności.',
+      },
+      {
+        title: 'Nastolatki',
+        text: 'Chcesz uśmiechu, z którym dobrze czujesz się na zdjęciach i na co dzień? Pokaż tę stronę rodzicom — pierwszą rozmowę zrobimy razem.',
+        share: true,
+      },
+      {
+        title: 'Rodzice',
+        text: 'Zanim cokolwiek zdecydujecie, dostajecie jasny plan: co, jak długo i ile to kosztuje. Rozmawiam z dzieckiem i z Tobą — spokojnie i konkretnie.', // TODO: potwierdź
+      },
+    ],
+    // Treść wiadomości przy „Wyślij rodzicom” (nastolatek wysyła ją rodzicowi)
+    shareLabel: 'Wyślij rodzicom',
+    shareText: 'Chcę porozmawiać o leczeniu ortodontycznym. Zobacz tę stronę:',
+  },
+
+  // ---------------------------------------------------------------------------
+  //  Przed odbudową estetyczną (licówki, bonding, korony, implanty). null = brak.
+  // ---------------------------------------------------------------------------
+  restoration: {
+    eyebrow: 'Przed odbudową estetyczną',
+    title: 'Piękna odbudowa zaczyna się od zgryzu',
+    lead: 'Myślisz o licówkach, bondingu albo koronach? Sprawdź, czy nie warto najpierw wyrównać zgryzu.',
+    text: 'Gdy zęby stoją na swoim miejscu, odbudowa wygląda naturalniej, często wymaga mniej szlifowania i dłużej służy. Leczenie ortodontyczne bywa pierwszym krokiem do uśmiechu, który planujesz.', // TODO: potwierdź
+    cta: 'Sprawdź swój zgryz',
+  },
+
+  // ---------------------------------------------------------------------------
+  //  Opinie — bez liczb, tylko zaproszenie do przeczytania opinii w ZnanyLekarz
   // ---------------------------------------------------------------------------
   reviews: {
     sourceName: 'ZnanyLekarz',
-    count: null, // TODO: liczba opinii z profilu ZnanyLekarz, np. 87
-    average: null, // TODO: średnia ocena, np. 4.9
-    updatedAt: null, // TODO: data sprawdzenia liczb, format 'RRRR-MM-DD', np. '2026-10-04'
+    title: 'Nie musisz wierzyć mi na słowo',
+    text: 'Pacjenci opisują swoje leczenie własnymi słowami. Przeczytaj, zanim cokolwiek zdecydujesz.',
+    linkLabel: 'Przeczytaj opinie pacjentów',
     url: 'https://www.znanylekarz.pl/damian-nowacki/stomatolog/krakow',
   },
 
@@ -86,6 +154,8 @@ export default {
   //  Rezerwacja online (ZnanyLekarz)
   // ---------------------------------------------------------------------------
   booking: {
+    title: 'Wybierz termin. Resztę zostaw mnie.',
+    text: 'Kalendarz pokazuje aktualne wolne terminy. Rezerwacja zajmuje chwilę i działa o każdej porze — także w nocy.',
     profileUrl: 'https://www.znanylekarz.pl/damian-nowacki/stomatolog/krakow',
     // Oficjalny kod widżetu z panelu ZnanyLekarz (Ustawienia → Widżety).
     // Wklej go w całości między backticki. Ładuje się dopiero po kliknięciu
@@ -94,11 +164,14 @@ export default {
   },
 
   // ---------------------------------------------------------------------------
-  //  Formularz „Oddzwonimy”
+  //  Formularz „Oddzwonimy” — dwa kroki: 1) jedno kliknięcie, 2) dane kontaktowe
   // ---------------------------------------------------------------------------
   form: {
     name: 'kontakt', // nazwa formularza w Netlify — nie zmieniaj po wdrożeniu
-    intro: 'Zostaw imię i numer telefonu. Oddzwonimy, odpowiemy na pytania i ustalimy termin wizyty.', // TODO: potwierdź
+    title: 'Wolisz najpierw porozmawiać?',
+    intro: 'Dwa krótkie kroki. Oddzwonimy, odpowiemy na pytania i znajdziemy termin, który Ci pasuje.', // TODO: potwierdź
+    step1: 'Od czego zaczynamy?',
+    step2: 'Gdzie mamy zadzwonić?',
     // Jedno zdanie nad przyciskiem: kto i kiedy oddzwoni.
     callbackNote: 'Oddzwonimy w ciągu 1 dnia roboczego.', // TODO: potwierdź termin i dopisz, kto dzwoni (np. „Oddzwoni lek. dent. inż. Damian Nowacki lub asystentka…”)
     // Numer, z którego oddzwaniacie — pokazywany na stronie podziękowania,
@@ -106,13 +179,14 @@ export default {
     callbackPhone: null, // TODO: np. '+48 600 000 000'
     consentText:
       'Wyrażam zgodę na przetwarzanie moich danych osobowych, w tym informacji o planowanym leczeniu, w celu kontaktu w sprawie wizyty.',
-    // Opcje „Co Cię interesuje?”. `label` widzi pacjent (i trafia do Netlify),
+    // Opcje „Od czego zaczynamy?”. `label` widzi pacjent (i trafia do Netlify),
     // `notion` to DOKŁADNA nazwa opcji w kolumnie „Preferencja Leczenia”.
+    // Jeśli takiej opcji nie ma w Notion, zapisze się `notion.interestFallback`.
     interests: [
-      { label: 'Niewidoczne nakładki', notion: 'Niewidoczne nakładki' },
-      { label: 'Tradycyjny aparat stały', notion: 'Tradycyjny aparat stały' },
-      { label: 'Leczenie dziecka', notion: 'Dzieci' },
-      { label: 'Nie wiem — zdaję się na lekarza', notion: 'Zdaję się na opinię Doktora' },
+      { label: 'Nie wiem jeszcze — chcę poznać możliwości', notion: 'Zdaję się na opinię Doktora' },
+      { label: 'Leczenie nastolatka lub dziecka', notion: 'Dzieci' },
+      { label: 'Aparat stały', notion: 'Tradycyjny aparat stały' },
+      { label: 'Nakładki', notion: 'Niewidoczne nakładki' },
     ],
   },
 
@@ -122,20 +196,21 @@ export default {
   },
 
   // ---------------------------------------------------------------------------
-  //  Jak wygląda pierwsza wizyta — 3 kroki
+  //  Pierwsza wizyta — 3 kroki (linia postępu wypełnia się przy przewijaniu)
   // ---------------------------------------------------------------------------
+  firstVisitTitle: 'Od pierwszej rozmowy do decyzji',
   firstVisit: [
     {
-      title: 'Konsultacja',
-      text: 'Rozmawiamy o tym, co chcesz zmienić, i oglądam zgryz. Dowiesz się, czy leczenie jest wskazane i jakie są możliwe sposoby.', // TODO: przejrzyj; możesz dopisać czas trwania i koszt
+      title: 'Rozmowa',
+      text: 'Mówisz, co Ci przeszkadza. Ja słucham i oglądam zgryz. Bez oceniania i bez pośpiechu.', // TODO: przejrzyj; możesz dopisać czas trwania i koszt konsultacji
     },
     {
-      title: 'Diagnostyka i plan leczenia',
-      text: 'Na podstawie dokumentacji przygotowuję plan leczenia: proponowaną metodę, przybliżony czas trwania i koszt.', // TODO: dopisz, jaka dokumentacja (np. zdjęcia RTG, skan wewnątrzustny, fotografie)
+      title: 'Plan',
+      text: 'Dostajesz konkretny plan leczenia: metodę, przybliżony czas i koszt. Czarno na białym.', // TODO: dopisz, jaka dokumentacja (np. zdjęcia RTG, skan wewnątrzustny, fotografie)
     },
     {
       title: 'Decyzja',
-      text: 'Decyzję o rozpoczęciu leczenia podejmujesz po zapoznaniu się z planem — nie musisz decydować podczas pierwszej wizyty.', // TODO: potwierdź
+      text: 'Decydujesz Ty — w swoim tempie, kiedy wszystko jest jasne.', // TODO: potwierdź
     },
   ],
 
@@ -144,21 +219,60 @@ export default {
   // ---------------------------------------------------------------------------
   services: [
     {
-      title: 'Nakładki ortodontyczne',
-      text: 'Przezroczyste, zdejmowane nakładki wymieniane zgodnie z planem leczenia. Zdejmuje się je do jedzenia i mycia zębów.', // TODO: przejrzyj
+      title: 'Ortodoncja dorosłych',
+      text: 'Stłoczenia, przerwy, krzywe zęby czy nieprawidłowy zgryz. Leczenie, które poprawia estetykę uśmiechu i to, jak zęby ze sobą współpracują.', // TODO: przejrzyj
+    },
+    {
+      title: 'Nastolatki',
+      text: 'Okres wzrostu to dobry moment na leczenie — łatwiej wpłynąć na rozwój zgryzu. Plan omawiamy razem z rodzicem.', // TODO: przejrzyj
+    },
+    {
+      title: 'Dzieci',
+      text: 'Wczesna ocena zgryzu pozwala wychwycić wady, zanim się utrwalą. Czasem wystarczy obserwacja, czasem krótkie leczenie.', // TODO: przejrzyj
+    },
+    {
+      title: 'Przed odbudową estetyczną i implantami',
+      text: 'Ustawienie zębów przed licówkami, bondingiem, koronami czy implantami — żeby odbudowa wyglądała naturalnie i była mniej inwazyjna.', // TODO: przejrzyj
+    },
+    {
+      title: 'Aparaty stałe i nakładki',
+      text: 'Metodę dobieram do zgryzu i Twojego stylu życia — nie odwrotnie.', // TODO: przejrzyj
       systems: [], // TODO: systemy nakładek, z którymi pracujesz, np. ['Invisalign', 'Spark']
     },
+  ],
+
+  // ---------------------------------------------------------------------------
+  //  Pytania i obawy — rozwijane odpowiedzi. Usuń wpis, żeby go ukryć.
+  // ---------------------------------------------------------------------------
+  faqTitle: 'Pytania, które słyszę najczęściej',
+  faq: [
     {
-      title: 'Aparaty stałe',
-      text: 'Zamki przyklejane do zębów i łuk, który stopniowo przesuwa zęby. Leczenie wymaga regularnych wizyt kontrolnych.', // TODO: przejrzyj; możesz dopisać rodzaje (metalowe, estetyczne)
+      q: 'Odkładam to od lat. Czy to jeszcze ma sens?',
+      a: 'Tak. Zęby można przesuwać w każdym wieku, jeśli dziąsła i kości są zdrowe. Wiele osób zaczyna leczenie dopiero jako dorośli.',
     },
     {
-      title: 'Leczenie dzieci',
-      text: 'Ocena rozwoju zgryzu u dzieci i leczenie dopasowane do wieku oraz etapu wymiany zębów.', // TODO: przejrzyj
+      q: 'Planuję licówki lub bonding. Po co mi ortodoncja?',
+      a: 'Gdy zęby stoją we właściwym miejscu, a zgryz jest wyrównany, licówki i bonding wyglądają naturalniej i dłużej służą. Często można też zachować więcej własnej tkanki zęba. Warto to sprawdzić przed rozpoczęciem odbudowy.', // TODO: potwierdź
     },
     {
-      title: 'Przed leczeniem protetycznym i implantologicznym',
-      text: 'Ustawienie zębów i przygotowanie miejsca przed koronami, mostami lub implantami, w porozumieniu z lekarzem prowadzącym dalsze leczenie.', // TODO: przejrzyj
+      q: 'Aparat stały czy nakładki?',
+      a: 'To zależy od zgryzu, nie od mody. Obie metody mają swoje miejsce — wybieramy tę, która w Twoim przypadku zadziała pewniej.',
+    },
+    {
+      q: 'Kiedy zacząć leczenie u dziecka lub nastolatka?',
+      a: 'Pierwszą kontrolę zgryzu warto zrobić około 7. roku życia. Szczególnie ważna jest też obserwacja między 9. a 12. rokiem życia — wtedy najczęściej przypada okres intensywnego wzrostu, który można wykorzystać w leczeniu.',
+    },
+    {
+      q: 'Jestem rodzicem. Jak to wygląda z mojej strony?',
+      a: 'Na konsultacji rozmawiamy razem — z dzieckiem i z Tobą. Dostajecie jasny plan: metodę, czas i koszt. Decyzję podejmujecie wspólnie, bez presji.', // TODO: potwierdź
+    },
+    {
+      q: 'Czy to boli?',
+      a: 'Przez pierwsze dni po założeniu aparatu lub kolejnej nakładki zęby mogą być wrażliwe na nacisk. To normalne i szybko mija.',
+    },
+    {
+      q: 'Ile trwa leczenie i ile kosztuje?',
+      a: 'To zależy od zgryzu i metody: od kilku miesięcy przy drobnych korektach do około dwóch lat przy złożonych wadach. Konkretny czas i koszt dostajesz w planie leczenia — zanim podejmiesz decyzję.', // TODO: potwierdź zakres; możesz dopisać cenę konsultacji
     },
   ],
 
@@ -180,23 +294,29 @@ export default {
 
   // ---------------------------------------------------------------------------
   //  Gdzie przyjmuję
-  //  Nowa placówka = nowy wpis. `show: false` ukrywa wpis bez kasowania.
+  //  Kolejność = kolejność na stronie. `featured: true` = główne miejsce:
+  //  własna sekcja wysoko na stronie, wyróżniona karta i pierwsze miejsce
+  //  w pierwszym ekranie. `show: false` ukrywa wpis bez kasowania.
   // ---------------------------------------------------------------------------
   locations: [
     {
       show: true,
-      name: 'LUX MED Stomatologia',
-      street: 'ul. Saska 25C',
-      postalCode: null, // TODO: kod pocztowy
+      featured: true,
+      name: 'ORTHOHOUSE',
+      descriptor: 'Centrum Ortodoncji i Kompleksowej Stomatologii',
+      street: 'ul. Kobierzyńska 145/LU5',
+      postalCode: '30-382',
       city: 'Kraków',
-      note: null, // np. 'Wejście od…', 'Parking dla pacjentów'
+      note: 'Przyjęcia od grudnia 2026', // usuń po otwarciu
+      // Tekst w sekcji ORTHOHOUSE
+      text: 'Miejsce zbudowane wokół leczenia ortodontycznego. Z czasem na rozmowę, starannie zaplanowanym leczeniem i dbałością o estetykę uśmiechu na każdym etapie — od pierwszej konsultacji do efektu końcowego.', // TODO: potwierdź / dopisz, co wyróżnia klinikę
       mapUrl: null, // null = link do Map Google wygenerowany z adresu
-      image: null, // opcjonalnie zdjęcie placówki, np. 'assets/saska.jpg'
+      image: null, // opcjonalnie zdjęcie wnętrza, np. 'assets/orthohouse.jpg'
     },
     {
       show: true,
-      name: 'LUX MED Stomatologia',
-      street: 'ul. Wadowicka 7',
+      name: 'LUX MED',
+      street: 'ul. Saska 25C',
       postalCode: null, // TODO: kod pocztowy
       city: 'Kraków',
       note: null,
@@ -204,13 +324,12 @@ export default {
       image: null,
     },
     {
-      // Własna klinika — od grudnia 2026. Uzupełnij dane i zmień show na true.
-      show: false,
-      name: 'Nazwa kliniki', // TODO: nazwa własnej kliniki
-      street: 'ul. …', // TODO: adres
-      postalCode: null, // TODO
+      show: true,
+      name: 'LUX MED',
+      street: 'ul. Wadowicka 7',
+      postalCode: null, // TODO: kod pocztowy
       city: 'Kraków',
-      note: 'Od grudnia 2026', // TODO: zmień lub usuń po otwarciu
+      note: null,
       mapUrl: null,
       image: null,
     },
@@ -220,15 +339,27 @@ export default {
   //  Administrator danych (RODO) — stopka i polityka prywatności
   // ---------------------------------------------------------------------------
   admin: {
-    name: null, // TODO: np. 'Damian Nowacki, prowadzący działalność gospodarczą pod firmą …'
-    address: null, // TODO: adres do korespondencji
-    nip: null, // TODO (opcjonalnie): NIP
-    email: null, // TODO: e-mail do spraw danych osobowych
+    name: 'lek. dent. inż. Damian Nowacki',
+    address: null, // adres do korespondencji (opcjonalnie)
+    nip: '5461384679',
+    email: 'kontakt@drnowacki.pl',
   },
 
   privacy: {
-    updatedAt: '2026-10-04', // data ostatniej zmiany polityki prywatności
-    retention: null, // TODO: jak długo przechowujecie zgłoszenia, np. 'do 12 miesięcy od zgłoszenia lub do wycofania zgody'
+    updatedAt: '2026-10-07', // data ostatniej zmiany polityki prywatności
+    retention:
+      'Dane ze zgłoszenia przechowujemy przez czas potrzebny do kontaktu w sprawie wizyty, nie dłużej niż 24 miesiące od wysłania zgłoszenia — albo krócej, jeśli wcześniej wycofasz zgodę. Informację o udzielonej zgodzie (jej treść i datę) możemy przechowywać dłużej, do upływu terminu przedawnienia ewentualnych roszczeń, aby móc wykazać, że zgoda została udzielona (art. 6 ust. 1 lit. f RODO). Jeśli dojdzie do wizyty, dane w dokumentacji medycznej placówki są przechowywane na zasadach wynikających z przepisów o prawach pacjenta.',
+    // Podmioty przetwarzające dane na zlecenie administratora (usługi techniczne)
+    processors: [
+      { name: 'Netlify, Inc.', role: 'hosting strony i obsługa formularza' },
+      { name: 'Google Ireland Limited (Gmail)', role: 'poczta e-mail, na którą przychodzą powiadomienia o zgłoszeniach' },
+      { name: null, role: 'dostawca narzędzia w chmurze, w którym prowadzimy listę zgłoszeń' },
+    ],
+    // Placówki, którym dane mogą być przekazane w celu umówienia wizyty
+    facilities: [
+      { name: 'ORTHOHOUSE — Centrum Ortodoncji i Kompleksowej Stomatologii', address: 'ul. Kobierzyńska 145/LU5, 30-382 Kraków', nip: null },
+      { name: 'LUX MED', address: 'ul. Saska 25C, Kraków', nip: '5272523080' },
+    ],
   },
 
   social: {
@@ -274,5 +405,8 @@ export default {
     },
     // Tych właściwości funkcja nigdy nie zapisuje.
     protected: ['Status'],
+    // Gdy opcji z form.interests nie ma w kolumnie „Preferencja Leczenia”,
+    // zapisuje się ta (pełny wybór pacjenta i tak jest w Netlify i w e-mailu).
+    interestFallback: 'Zdaję się na opinię Doktora',
   },
 };

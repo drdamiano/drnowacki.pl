@@ -1,8 +1,11 @@
 // drnowacki.pl — jedyny skrypt strony (bez zależności, bez cookies).
 // 1. Źródło wejścia (UTM, referrer) → sessionStorage → ukryte pola formularza
-// 2. Walidacja formularza „Oddzwonimy” z komunikatami po polsku
+// 2. Formularz „Oddzwonimy”: dwa kroki, walidacja z komunikatami po polsku
 // 3. Widżet ZnanyLekarz ładowany dopiero po kliknięciu
 // 4. Pasek z przyciskami na telefonach
+// 5. Ruch: sekcje pojawiają się przy przewijaniu, słowa się rozjaśniają,
+//    linia postępu kroków, pasek z hasłami i paralaksa portretu
+// 6. „Wyślij rodzicom” — udostępnianie strony (z oznaczeniem źródła)
 
 import { normalizePLPhone, formatPLPhone } from './phone.mjs';
 
@@ -104,6 +107,50 @@ function validateField(input) {
   }
 }
 
+// Dwa kroki: 1) jedno kliknięcie (co Cię interesuje), 2) dane kontaktowe.
+// Kliknięcie palcem/myszą w opcję od razu przechodzi dalej; z klawiatury — przycisk „Dalej”.
+function initSteps(form) {
+  const steps = [...form.querySelectorAll('[data-step]')];
+  if (steps.length !== 2) return () => 2;
+  const progress = form.querySelector('[data-form-progress]');
+  const label = form.querySelector('[data-step-label]');
+  const next = form.querySelector('[data-next]');
+  const back = form.querySelector('[data-back]');
+  const radios = [...steps[0].querySelectorAll('input[type="radio"]')];
+  let current = 1;
+  let timer;
+
+  const show = (n, focus) => {
+    current = n;
+    steps.forEach((s, i) => s.classList.toggle('is-current', i === n - 1));
+    label.textContent = `Krok ${n} z 2`;
+    progress.style.setProperty('--step-p', String(n / 2));
+    if (focus) steps[n - 1].querySelector('.form__step-title').focus();
+  };
+  const updateNext = () => {
+    next.textContent = radios.some((r) => r.checked) ? 'Dalej' : 'Pomiń';
+  };
+
+  form.classList.add('is-stepped');
+  [progress, back, form.querySelector('[data-step-actions]')].forEach((el) => el && (el.hidden = false));
+
+  radios.forEach((r) => r.addEventListener('change', updateNext));
+  steps[0].querySelectorAll('.choice').forEach((choice) =>
+    choice.addEventListener('pointerup', () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        if (choice.querySelector('input').checked) show(2, true);
+      }, 350);
+    }),
+  );
+  next.addEventListener('click', () => show(2, true));
+  back.addEventListener('click', () => show(1, true));
+
+  updateNext();
+  show(1, false);
+  return () => current;
+}
+
 function initForm(form, attribution) {
   form.noValidate = true; // własne komunikaty zamiast dymków przeglądarki
 
@@ -115,6 +162,7 @@ function initForm(form, attribution) {
 
   const fields = ['imie', 'telefon', 'email', 'zgoda'].map((n) => form.elements.namedItem(n)).filter(Boolean);
   const submit = form.querySelector('[type="submit"]');
+  const currentStep = initSteps(form);
   let attempted = false;
 
   fields.forEach((input) => {
@@ -129,6 +177,12 @@ function initForm(form, attribution) {
   });
 
   form.addEventListener('submit', (e) => {
+    // Enter w kroku 1 nie wysyła formularza — przechodzi do kroku 2
+    if (currentStep() === 1) {
+      e.preventDefault();
+      form.querySelector('[data-next]')?.click();
+      return;
+    }
     attempted = true;
     let firstInvalid = null;
     fields.forEach((input) => {
@@ -229,6 +283,137 @@ function initCtaBar() {
 }
 
 // ---------------------------------------------------------------------------
+// 5. Ruch przy przewijaniu (klasę js-reveal ustawia skrypt w <head>;
+//    przy „ogranicz ruch” jej nie ma i wszystko jest od razu widoczne)
+// ---------------------------------------------------------------------------
+const clamp = (v, min = 0, max = 1) => Math.min(max, Math.max(min, v));
+
+function initReveal() {
+  window.__reveal = true;
+  const root = document.documentElement;
+  if (!root.classList.contains('js-reveal')) return;
+  if (!('IntersectionObserver' in window)) {
+    root.classList.remove('js-reveal');
+    return;
+  }
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-revealed');
+        io.unobserve(entry.target);
+      });
+    },
+    { rootMargin: '0px 0px -8% 0px' },
+  );
+  document.querySelectorAll('[data-reveal]').forEach((el) => io.observe(el));
+}
+
+// Efekty powiązane z przewijaniem — jedna pętla requestAnimationFrame.
+function initScrollEffects() {
+  if (!document.documentElement.classList.contains('js-reveal')) return;
+
+  const scrub = document.querySelector('[data-scrub]');
+  const words = scrub ? [...scrub.querySelectorAll('.sw')] : [];
+  const steps = document.querySelector('[data-progress]');
+  const stepItems = steps ? [...steps.querySelectorAll('.step')] : [];
+  const ticker = document.querySelector('[data-ticker]');
+  const portrait = document.querySelector('[data-parallax] img');
+  const drift = document.querySelector('[data-drift]');
+  let lit = -1;
+  let queued = false;
+
+  const update = () => {
+    queued = false;
+    const vh = window.innerHeight;
+
+    // Ciemna sekcja: kolejne słowa rozjaśniają się, gdy tekst przesuwa się przez ekran
+    if (words.length) {
+      const r = scrub.getBoundingClientRect();
+      const p = clamp((vh * 0.85 - r.top) / (r.height + vh * 0.4));
+      const n = Math.round(p * words.length);
+      if (n !== lit) {
+        lit = n;
+        words.forEach((w, i) => w.classList.toggle('is-lit', i < n));
+      }
+    }
+
+    // Kroki pierwszej wizyty: linia postępu i aktywne punkty
+    if (steps) {
+      const r = steps.getBoundingClientRect();
+      const p = clamp((vh * 0.75 - r.top) / r.height);
+      steps.style.setProperty('--p', p.toFixed(3));
+      stepItems.forEach((s, i) => s.classList.toggle('is-active', p >= (i + 0.25) / stepItems.length));
+    }
+
+    // Pasek z zakresem: przesuwa się tylko razem z przewijaniem
+    if (ticker) {
+      const half = ticker.scrollWidth / 2;
+      if (half) ticker.style.transform = `translate3d(${(-(window.scrollY * 0.35) % half).toFixed(1)}px,0,0)`;
+    }
+
+    // Monogram w tle ciemnej sekcji: powoli „płynie” wbrew przewijaniu
+    if (drift) {
+      const r = drift.parentElement.getBoundingClientRect();
+      if (r.bottom > 0 && r.top < vh) {
+        drift.style.translate = `0 ${((clamp((vh - r.top) / (vh + r.height)) - 0.5) * -90).toFixed(1)}px`;
+      }
+    }
+
+    // Portret: delikatna paralaksa w obrębie kadru
+    if (portrait) {
+      const r = portrait.parentElement.getBoundingClientRect();
+      if (r.bottom > 0 && r.top < vh) {
+        portrait.style.translate = `0 ${(clamp(-r.top / r.height, -1, 1) * 22).toFixed(1)}px`;
+      }
+    }
+  };
+
+  const onScroll = () => {
+    if (!queued) {
+      queued = true;
+      requestAnimationFrame(update);
+    }
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  update();
+}
+
+// ---------------------------------------------------------------------------
+// 6. „Wyślij rodzicom”: systemowe udostępnianie (WhatsApp, Messenger, SMS…),
+//    a gdy go nie ma — skopiowanie linku. Link ma utm_source=polecenie.
+// ---------------------------------------------------------------------------
+function initShare() {
+  document.querySelectorAll('[data-share]').forEach((btn) => {
+    const status = btn.parentElement.querySelector('[data-share-status]');
+    const say = (msg) => status && (status.textContent = msg);
+    btn.hidden = false;
+    btn.addEventListener('click', async () => {
+      const url = new URL(btn.dataset.shareUrl, location.origin).href;
+      const text = btn.dataset.shareText;
+      if (navigator.share) {
+        try {
+          await navigator.share({ text, url });
+          return;
+        } catch (err) {
+          if (err.name === 'AbortError') return; // ktoś zamknął okno udostępniania
+        }
+      }
+      try {
+        await navigator.clipboard.writeText(`${text} ${url}`);
+        say('Link skopiowany — wklej go rodzicom w wiadomości.');
+      } catch {
+        say(`Skopiuj i wyślij: ${url}`);
+      }
+    });
+  });
+}
+
+// ---------------------------------------------------------------------------
+initReveal();
+initShare();
+initScrollEffects();
 const attribution = getAttribution(); // na każdej stronie — zapamiętuje pierwsze wejście w sesji
 const form = document.querySelector('[data-lead-form]');
 if (form) initForm(form, attribution);

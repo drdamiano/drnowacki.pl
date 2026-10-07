@@ -8,7 +8,15 @@ const schema = {
   'Imię i Nazwisko': { id: 'title', type: 'title' },
   Telefon: { id: 'a', type: 'number' },
   Email: { id: 'b', type: 'email' },
-  'Preferencja Leczenia': { id: 'c', type: 'select' },
+  'Preferencja Leczenia': {
+    id: 'c',
+    type: 'select',
+    select: {
+      options: ['Nie wiem', 'Dzieci', 'AS', 'Nakładki', 'Niewidoczne nakładki', 'Zdaję się na opinię Doktora', 'Tradycyjny aparat stały'].map(
+        (name) => ({ name }),
+      ),
+    },
+  },
   Status: { id: 'd', type: 'select' },
 };
 
@@ -20,7 +28,7 @@ const payload = (data = {}) => ({
     imie: 'Anna',
     telefon: '+48 600 123 456',
     email: 'anna@example.com',
-    leczenie: 'Leczenie dziecka',
+    leczenie: 'Leczenie nastolatka lub dziecka',
     zgoda: 'tak',
     utm_source: 'instagram',
     utm_medium: 'bio',
@@ -46,15 +54,29 @@ test('mapuje zgłoszenie na istniejące właściwości bazy', () => {
 
 test('dokładne nazwy opcji „Preferencja Leczenia”', () => {
   const expected = {
-    'Niewidoczne nakładki': 'Niewidoczne nakładki',
-    'Tradycyjny aparat stały': 'Tradycyjny aparat stały',
-    'Leczenie dziecka': 'Dzieci',
-    'Nie wiem — zdaję się na lekarza': 'Zdaję się na opinię Doktora',
+    'Nakładki': 'Niewidoczne nakładki',
+    'Aparat stały': 'Tradycyjny aparat stały',
+    'Leczenie nastolatka lub dziecka': 'Dzieci',
+    'Nie wiem jeszcze — chcę poznać możliwości': 'Zdaję się na opinię Doktora',
   };
   for (const [label, notion] of Object.entries(expected)) {
     const props = buildProperties(schema, leadFromSubmission(payload({ leczenie: label }), config), config);
     assert.deepEqual(props['Preferencja Leczenia'], { select: { name: notion } }, label);
   }
+});
+
+test('opcja, której nie ma w Notion → opcja zastępcza (bez zmiany schematu)', () => {
+  const cfg = {
+    ...config,
+    form: { ...config.form, interests: [...config.form.interests, { label: 'Nowa opcja', notion: 'Nowa opcja w Notion' }] },
+  };
+  const props = buildProperties(schema, leadFromSubmission(payload({ leczenie: 'Nowa opcja' }), cfg), cfg);
+  assert.deepEqual(props['Preferencja Leczenia'], { select: { name: 'Zdaję się na opinię Doktora' } });
+  // …a gdy właściciel doda opcję w Notion, zapisze się właściwa nazwa
+  const s = structuredClone(schema);
+  s['Preferencja Leczenia'].select.options.push({ name: 'Nowa opcja w Notion' });
+  const props2 = buildProperties(s, leadFromSubmission(payload({ leczenie: 'Nowa opcja' }), cfg), cfg);
+  assert.deepEqual(props2['Preferencja Leczenia'], { select: { name: 'Nowa opcja w Notion' } });
 });
 
 test('pola opcjonalne puste → nie są wysyłane', () => {

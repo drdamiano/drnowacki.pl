@@ -47,10 +47,17 @@ export const formatDatePL = (iso) =>
     new Date(`${iso}T00:00:00Z`),
   );
 
-export const formatRating = (n) =>
-  Number(n).toLocaleString('pl-PL', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-
 export const fullName = (p) => `${p.firstName} ${p.lastName}`;
+
+// Polska typografia: jednoliterowe słowa (i, w, z, a, o, u) i półpauza nie zostają
+// same na końcu wiersza — łączymy je twardą spacją z następnym słowem.
+export const nbspShort = (text) =>
+  String(text)
+    .replace(/(^|\s)([aiouwzAIOUWZ]) /g, '$1$2\u00A0')
+    .replace(/ ([—–]) /g, '\u00A0$1 ');
+
+// Podział na słowa po zwykłych spacjach (twarde spacje zostają w środku „słowa”)
+export const splitWords = (text) => nbspShort(text).split(/[ \t\n]+/).filter(Boolean);
 
 export const mapUrl = (loc) =>
   loc.mapUrl ||
@@ -59,8 +66,6 @@ export const mapUrl = (loc) =>
   )}`;
 
 export const visibleLocations = (config) => config.locations.filter((l) => l.show !== false);
-
-export const hasReviewNumbers = (r) => r.count != null && r.average != null;
 
 // Link otwierany w nowej karcie (z informacją dla czytników ekranu).
 export const extLink = (href, label, { className = 'link', hint = 'otwiera się w nowej karcie' } = {}) =>

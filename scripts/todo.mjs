@@ -41,7 +41,6 @@ export function printTodos(todos, { compact = false } = {}) {
   for (const t of todos) {
     console.log(`  site.config.mjs:${String(t.line).padEnd(4)} ${t.where.padEnd(28)} ${t.note}`);
   }
-  console.log('\nPolityka prywatności: fragmenty oznaczone [TODO] (src/templates/pages.mjs) są widoczne na stronie, dopóki ich nie uzupełnisz.');
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

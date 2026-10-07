@@ -68,18 +68,17 @@ export function renderNotFound(ctx) {
 }
 
 // ---------------------------------------------------------------------------
-//  /polityka-prywatnosci — SZKIELET do uzupełnienia (TODO) i weryfikacji prawnej
+//  /polityka-prywatnosci — treść z site.config.mjs (admin, privacy)
 // ---------------------------------------------------------------------------
-const todo = (text) => html`<mark class="todo">[TODO: ${text}]</mark>`;
-
 export function renderPrivacy(ctx) {
   const { admin, privacy, person } = ctx.config;
-  const adminBlock = admin.name
-    ? html`${admin.name}${admin.address ? html`, ${admin.address}` : ''}${admin.nip ? html`, NIP ${admin.nip}` : ''}`
-    : todo('imię i nazwisko / firma administratora, adres, NIP');
-  const contact = admin.email
-    ? html`<a class="link" href="mailto:${admin.email}">${admin.email}</a>`
-    : todo('adres e-mail do spraw danych osobowych');
+  const adminBlock = html`${admin.name}${admin.address ? html`, ${admin.address}` : ''}${admin.nip ? html`, NIP ${admin.nip}` : ''}`;
+  const contact = html`<a class="link" href="mailto:${admin.email}">${admin.email}</a>`;
+  const list = (items) => items.map((t, i) => html`<li>${t}${i < items.length - 1 ? ',' : '.'}</li>`);
+  const processors = (privacy.processors ?? []).map((p) => (p.name ? html`${p.name} — ${p.role}` : html`${p.role}`));
+  const facilities = (privacy.facilities ?? []).map(
+    (f) => html`${f.name}, ${f.address}${f.nip ? html`, NIP ${f.nip}` : ''}`,
+  );
 
   const body = html`<article class="section page prose" aria-labelledby="pp-title">
   <div class="container narrow">
@@ -88,7 +87,7 @@ export function renderPrivacy(ctx) {
     <p class="muted small">Ostatnia aktualizacja: ${formatDatePL(privacy.updatedAt)} r.</p>
 
     <h2>1. Administrator danych</h2>
-    <p>Administratorem danych osobowych przekazanych przez formularz na stronie drnowacki.pl jest: ${adminBlock}.</p>
+    <p>Administratorem danych osobowych przekazanych przez formularz na stronie drnowacki.pl jest ${adminBlock}.</p>
     <p>Kontakt w sprawach danych osobowych: ${contact}.</p>
 
     <h2>2. Jakie dane zbieramy</h2>
@@ -102,25 +101,24 @@ export function renderPrivacy(ctx) {
     </ul>
 
     <h2>3. Cel i podstawa prawna</h2>
-    <p>Dane przetwarzamy wyłącznie po to, aby skontaktować się z Tobą w sprawie wizyty, na podstawie Twojej zgody (art. 6 ust. 1 lit. a RODO), a w zakresie informacji o planowanym leczeniu — Twojej wyraźnej zgody (art. 9 ust. 2 lit. a RODO). ${todo('zweryfikuj podstawy prawne z prawnikiem / IOD')}</p>
+    <p>Dane przetwarzamy po to, aby skontaktować się z Tobą w sprawie wizyty — na podstawie Twojej zgody (art. 6 ust. 1 lit. a RODO), a w zakresie informacji o planowanym leczeniu na podstawie Twojej wyraźnej zgody (art. 9 ust. 2 lit. a RODO).</p>
+    <p>Informację o udzielonej zgodzie przechowujemy także po to, aby móc wykazać, że została udzielona, oraz w celu ustalenia, dochodzenia lub obrony ewentualnych roszczeń — na podstawie prawnie uzasadnionego interesu administratora (art. 6 ust. 1 lit. f RODO).</p>
 
     <h2>4. Dobrowolność</h2>
     <p>Podanie danych jest dobrowolne, ale bez imienia, numeru telefonu i zgody nie możemy oddzwonić. Możesz też umówić wizytę online bez wypełniania formularza.</p>
 
     <h2>5. Odbiorcy danych</h2>
-    <p>Dane mogą być przekazywane podmiotom, które świadczą dla nas usługi techniczne:</p>
-    <ul>
-      <li>Netlify, Inc. — hosting strony i obsługa formularza, ${todo('potwierdź podstawę transferu do USA, np. EU-US Data Privacy Framework / standardowe klauzule umowne, i zawarcie umowy powierzenia (DPA)')},</li>
-      <li>Notion Labs, Inc. — narzędzie, w którym prowadzimy listę zgłoszeń, ${todo('jw. — podstawa transferu i DPA')},</li>
-      <li>${todo('dostawca poczty e-mail, na którą przychodzą powiadomienia o zgłoszeniach')},</li>
-      <li>${todo('ewentualnie placówka, w której umawiana jest wizyta (np. LUX MED) — jeśli dane są jej przekazywane')}.</li>
-    </ul>
+    <p>Dane mogą być powierzane podmiotom, które świadczą dla nas usługi techniczne i przetwarzają je wyłącznie na nasze polecenie:</p>
+    <ul>${list(processors)}</ul>
+    <p>W zakresie potrzebnym do umówienia wizyty dane mogą zostać przekazane placówce, w której wizyta się odbędzie:</p>
+    <ul>${list(facilities)}</ul>
+    <p>Niektórzy dostawcy usług technicznych mogą przetwarzać dane poza Europejskim Obszarem Gospodarczym, m.in. w USA. W takim przypadku przekazanie odbywa się na podstawie decyzji Komisji Europejskiej stwierdzającej odpowiedni stopień ochrony (EU-US Data Privacy Framework) lub standardowych klauzul umownych zatwierdzonych przez Komisję Europejską.</p>
 
     <h2>6. Jak długo przechowujemy dane</h2>
-    <p>${privacy.retention ?? todo('okres przechowywania, np. „do 12 miesięcy od zgłoszenia lub do wycofania zgody”')}</p>
+    <p>${privacy.retention}</p>
 
     <h2>7. Twoje prawa</h2>
-    <p>Masz prawo dostępu do swoich danych, ich sprostowania, usunięcia, ograniczenia przetwarzania i przeniesienia. Zgodę możesz wycofać w każdej chwili — nie wpływa to na zgodność z prawem przetwarzania przed jej wycofaniem. Masz też prawo wnieść skargę do Prezesa Urzędu Ochrony Danych Osobowych (ul. Stawki 2, 00-193 Warszawa).</p>
+    <p>Masz prawo dostępu do swoich danych, ich sprostowania, usunięcia, ograniczenia przetwarzania i przeniesienia, a także prawo sprzeciwu wobec przetwarzania opartego na prawnie uzasadnionym interesie. Zgodę możesz wycofać w każdej chwili, pisząc na ${contact} — nie wpływa to na zgodność z prawem przetwarzania przed jej wycofaniem. Masz też prawo wnieść skargę do Prezesa Urzędu Ochrony Danych Osobowych (ul. Stawki 2, 00-193 Warszawa).</p>
 
     <h2>8. Pliki cookies i usługi zewnętrzne</h2>
     <p>Strona drnowacki.pl nie używa plików cookies ani narzędzi analitycznych i reklamowych.</p>

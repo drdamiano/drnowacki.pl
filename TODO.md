@@ -7,18 +7,19 @@ Dopóki pole ma wartość `null`, dany element **nie pojawia się na stronie** (
 
 | # | Gdzie | Co |
 |---|---|---|
-| 1 | `admin.name`, `admin.address`, `admin.email` (+ opcjonalnie `admin.nip`) | Administrator danych (RODO): stopka i polityka prywatności |
-| 2 | `privacy.retention` | Jak długo przechowujecie zgłoszenia |
-| 3 | `src/templates/pages.mjs` → `renderPrivacy` | Pozostałe `[TODO]` w polityce prywatności: weryfikacja podstaw prawnych, transfer do USA i DPA (Netlify, Notion), dostawca poczty, ewentualne przekazanie danych placówce. **Te znaczniki są widoczne na stronie.** |
+| 1 | ~~`admin`~~ | ✔ Zrobione (7.10.2026): lek. dent. inż. Damian Nowacki, NIP 5461384679, kontakt@drnowacki.pl |
+| 2 | ~~`privacy.retention`~~ | ✔ Zrobione: do 24 miesięcy od zgłoszenia lub do wycofania zgody; dowód zgody do przedawnienia roszczeń |
+| 3 | ~~polityka prywatności~~ | ✔ Zrobione: odbiorcy (Netlify, Gmail, narzędzie do listy zgłoszeń), placówki (ORTHOHOUSE, LUX MED Saska), bez znaczników TODO. Upewnij się, że skrzynka kontakt@drnowacki.pl działa |
 | 4 | `form.callbackNote` | Potwierdź „Oddzwonimy w ciągu 1 dnia roboczego.” i dopisz, **kto** dzwoni |
 | 5 | `form.callbackPhone` | Numer, z którego oddzwaniacie (pokazywany na /dziekujemy, żeby pacjent odebrał) |
-| 6 | `reviews.count`, `reviews.average`, `reviews.updatedAt` | Liczba opinii, średnia i data sprawdzenia z profilu ZnanyLekarz |
+| 6 | ~~liczba i średnia opinii~~ | Usunięte na życzenie (6.10.2026). Zostało zaproszenie do przeczytania opinii w ZnanyLekarz |
 | 7 | `booking.widgetHtml` | Kod widżetu z panelu ZnanyLekarz (bez niego przycisk prowadzi do profilu) |
 
 ## B. Treści do napisania lub potwierdzenia
 
 | # | Gdzie | Co |
 |---|---|---|
+| 8a | `person.hook`, `person.approach`, `audiences`, `restoration`, `faq`, `firstVisit`, `services` | Nowe, perswazyjne teksty (6.10.2026). Przeczytaj i potwierdź. Szczególnie odpowiedzi w `faq` o czasie leczenia i koszcie (oznaczone TODO) |
 | 8 | `person.approach` | Jedno zdanie o podejściu (pierwszy ekran). Informacyjnie: bez „najlepszy”, bez obietnic efektu |
 | 9 | `firstVisit[0].text` | Konsultacja: przejrzyj, możesz dopisać czas trwania i koszt |
 | 10 | `firstVisit[1].text` | Diagnostyka: jaka dokumentacja (RTG, skan, zdjęcia) |
@@ -34,8 +35,8 @@ Dopóki pole ma wartość `null`, dany element **nie pojawia się na stronie** (
 | # | Plik | Co |
 |---|---|---|
 | 17 | ~~`assets/portret.jpg`~~ | ✔ Zrobione (6.10.2026). Kadr zmienisz w `images.portrait.crop` |
-| 18 | `assets/logo.svg` + `brand.logo` | Logo. Do tego czasu logotyp tekstowy „ND · DAMIAN NOWACKI · ORTODONCJA” |
-| 19 | `assets/favicon.svg` | (opcjonalnie) własny favicon. Domyślnie monogram ND |
+| 18 | ~~logo~~ | ✔ Zrobione (6.10.2026): monogram ND wycięty z `assets/LOGO.jpg` jako wektor `assets/logo-nd.svg` (nagłówek, stopka, tło ciemnej sekcji), favicon `assets/favicon.svg`, obrazek OG |
+| 19 | ~~`assets/favicon.svg`~~ | ✔ Zrobione: monogram z logo na ciemnym tle |
 | 20 | `assets/og.jpg` | (opcjonalnie) obrazek do udostępniania 1200×630. Domyślnie neutralny z monogramem |
 | 21 | `locations[].image` | (opcjonalnie) zdjęcia placówek |
 
@@ -44,7 +45,7 @@ Dopóki pole ma wartość `null`, dany element **nie pojawia się na stronie** (
 | # | Gdzie | Co |
 |---|---|---|
 | 22 | `pricing.items[].price`, `pricing.note`, `pricing.visible` | Cennik: ceny + `visible: true`, gdy zdecydujesz się go pokazać |
-| 23 | `locations[2]` | Własna klinika (od grudnia 2026): nazwa, adres, kod, `note`, potem `show: true` |
+| 23 | ~~własna klinika~~ | ✔ Zrobione (7.10.2026): ORTHOHOUSE — Centrum Ortodoncji i Kompleksowej Stomatologii, widoczne już teraz jako główne miejsce. Po otwarciu usuń `note` w `locations[0]` (przycisk zmieni się z „Zapytaj o pierwsze terminy” na rezerwację online). Opcjonalnie: zdjęcie wnętrza w `locations[0].image` |
 | 24 | Notion | Opcjonalnie kolumna „Źródło” w „LEADY IG”. Zacznie się wypełniać sama (`instagram / bio`) |
 
 ## E. Wdrożenie (szczegóły w README)
