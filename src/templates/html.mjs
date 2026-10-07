@@ -59,10 +59,11 @@ export const nbspShort = (text) =>
 // Podział na słowa po zwykłych spacjach (twarde spacje zostają w środku „słowa”)
 export const splitWords = (text) => nbspShort(text).split(/[ \t\n]+/).filter(Boolean);
 
+// Link do Map Google: własny mapUrl, albo wyszukiwanie po mapQuery, albo po nazwie i adresie
 export const mapUrl = (loc) =>
   loc.mapUrl ||
   `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    [loc.name, loc.street, loc.postalCode, loc.city].filter(Boolean).join(', '),
+    loc.mapQuery || [loc.name, loc.street, loc.postalCode, loc.city].filter(Boolean).join(', '),
   )}`;
 
 export const visibleLocations = (config) => config.locations.filter((l) => l.show !== false);

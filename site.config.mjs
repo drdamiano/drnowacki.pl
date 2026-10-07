@@ -313,7 +313,9 @@ export default {
       // Tekst w sekcji ORTHOHOUSE
       // Inny wariant drugiego zdania: 'Od wyrównania zgryzu po estetyczną odbudowę — cały plan powstaje w jednym miejscu i prowadzi prosto do uśmiechu, który planujesz.'
       text: 'Miejsce zbudowane wokół leczenia ortodontycznego. Ortodoncja i kompleksowe leczenie stomatologiczne pod jednym dachem — jeden plan, jeden zespół i jeden cel: uśmiech, który pokochasz.',
-      mapUrl: null, // null = link do Map Google wygenerowany z adresu
+      // Mapy Google nie znają jeszcze nazwy ORTHOHOUSE ani lokalu LU5 — szukamy po samym adresie
+      mapQuery: 'Kobierzyńska 145, Kraków',
+      mapUrl: null, // własny link do mapy (ma pierwszeństwo przed mapQuery)
       image: null, // opcjonalnie zdjęcie wnętrza, np. 'assets/orthohouse.jpg'
     },
     {
