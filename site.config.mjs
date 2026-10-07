@@ -307,9 +307,12 @@ export default {
       street: 'ul. Kobierzyńska 145/LU5',
       postalCode: '30-382',
       city: 'Kraków',
-      note: 'Przyjęcia od grudnia 2026', // usuń po otwarciu
+      note: null, // krótka notka pokazywana jako plakietka, np. 'Wejście od…'
+      // Przycisk w sekcji: 'form' = „Zapytaj o termin” (formularz), 'booking' = rezerwacja online
+      cta: 'form',
       // Tekst w sekcji ORTHOHOUSE
-      text: 'Miejsce zbudowane wokół leczenia ortodontycznego. Z czasem na rozmowę, starannie zaplanowanym leczeniem i dbałością o estetykę uśmiechu na każdym etapie — od pierwszej konsultacji do efektu końcowego.', // TODO: potwierdź / dopisz, co wyróżnia klinikę
+      // Inny wariant drugiego zdania: 'Od wyrównania zgryzu po estetyczną odbudowę — cały plan powstaje w jednym miejscu i prowadzi prosto do uśmiechu, który planujesz.'
+      text: 'Miejsce zbudowane wokół leczenia ortodontycznego. Ortodoncja i kompleksowe leczenie stomatologiczne pod jednym dachem — jeden plan, jeden zespół i jeden cel: uśmiech, który pokochasz.',
       mapUrl: null, // null = link do Map Google wygenerowany z adresu
       image: null, // opcjonalnie zdjęcie wnętrza, np. 'assets/orthohouse.jpg'
     },

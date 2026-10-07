@@ -134,14 +134,15 @@ function manifesto(ctx) {
 function clinic(ctx) {
   const l = featuredLocation(ctx.config);
   const img = ctx.assets.locations[ctx.config.locations.indexOf(l)];
-  // Przed otwarciem (jest notka) przycisk prowadzi do formularza, potem do rezerwacji
-  const cta = l.note
-    ? html`<a class="btn btn--primary" href="#oddzwonimy">Zapytaj o pierwsze terminy</a>`
-    : html`<a class="btn btn--primary" href="#rezerwacja">${ctx.config.cta.primary}</a>`;
+  // locations[].cta: 'form' → formularz, inaczej rezerwacja online
+  const cta =
+    l.cta === 'form'
+      ? html`<a class="btn btn--primary" href="#oddzwonimy">Zapytaj o termin</a>`
+      : html`<a class="btn btn--primary" href="#rezerwacja">${ctx.config.cta.primary}</a>`;
   return html`<section id="orthohouse" class="section clinic" aria-labelledby="clinic-title">
   <div class="container clinic__grid">
     <header class="clinic__head" data-reveal>
-      <p class="eyebrow">Moje główne miejsce przyjęć</p>
+      <p class="eyebrow">Przyjmuję w</p>
       <h2 id="clinic-title" class="clinic__name">${l.name}</h2>
       ${l.descriptor ? html`<p class="clinic__descriptor">${l.descriptor}</p>` : ''}
       ${l.note ? html`<p class="badge">${l.note}</p>` : ''}

@@ -45,7 +45,7 @@ Dopóki pole ma wartość `null`, dany element **nie pojawia się na stronie** (
 | # | Gdzie | Co |
 |---|---|---|
 | 22 | `pricing.items[].price`, `pricing.note`, `pricing.visible` | Cennik: ceny + `visible: true`, gdy zdecydujesz się go pokazać |
-| 23 | ~~własna klinika~~ | ✔ Zrobione (7.10.2026): ORTHOHOUSE — Centrum Ortodoncji i Kompleksowej Stomatologii, widoczne już teraz jako główne miejsce. Po otwarciu usuń `note` w `locations[0]` (przycisk zmieni się z „Zapytaj o pierwsze terminy” na rezerwację online). Opcjonalnie: zdjęcie wnętrza w `locations[0].image` |
+| 23 | ~~własna klinika~~ | ✔ Zrobione: ORTHOHOUSE — Centrum Ortodoncji i Kompleksowej Stomatologii jako główne miejsce przyjęć. Opcjonalnie: zdjęcie wnętrza w `locations[0].image` |
 | 24 | Notion | Opcjonalnie kolumna „Źródło” w „LEADY IG”. Zacznie się wypełniać sama (`instagram / bio`) |
 
 ## E. Wdrożenie (szczegóły w README)
